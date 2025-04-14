@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrierung - Stadtverwaltung</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+    font-family: Arial;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+
+label {
+    font-weight: bold;
+}
+
+
+input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+   /* Abstand zwischen den Eingabefeldern und anderen Elementen */
+div {
+        margin-bottom: 15px;  /* Hier wird der Abstand erhöht */
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+</style>
+<body>
+    <div class="container">
+        <h2>Registrierung für Stadtverwaltung</h2>
+
+            <div>
+    <form method="post">
+        {% csrf_token %}
+        <select name="stadtverwaltung" required>
+            <option value="" disabled selected>Bitte wählen Sie Ihre Stadtverwaltung</option>
+            {% for gemeinde in gemeinden %}
+                <option value="{{ gemeinde.name }}">{{ gemeinde.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="email" name="email" placeholder="E-Mail" required>
+        <button type="submit">Anmelden</button>
+    </form>
+    {% if success %}
+        <p style="color: green;">Willkommensmail an {{ email }} wurde gesendet ✅</p>
+    {% endif %}
+    {% if fehler %}
+        <p style="color: red;">{{ fehler }}</p>
+    {% endif %}
+            </div>
+    </div>
+</body>
+</html>
