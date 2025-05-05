@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übersichtsseite</title>
+    <link rel="icon" href={% static 'KORA.png' %} type="image/png">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+        header img {
+            height: 40px;
+            cursor: pointer;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-icon {
+            height: 28px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .logout-icon:hover {
+            opacity: 0.7;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .stockwerk {
+            margin: 20px 0;
+        }
+
+        .zimmer-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .zimmer {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 150px;
+            text-align: center;
+            border: none;
+            font-weight: bold;
+        }
+
+        .zimmer:hover {
+            background-color: #0056b3;
+        }
+
+        .temperatur {
+            color: lightgray;
+        }
+
+        .back-button {
+            display: block;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        footer {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-icons">
+        <a href="{% url 'Info' %}">
+            <img src="{% static 'Info.png' %}" alt="Home_Icon" />
+        </a>
+    </div>
+
+    <h1>Zimmerverwaltung für {{ request.session.stadtverwaltung }}</h1>
+
+    <div class="header-right">
+        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+        <a href="{% url 'abmelden' %}" title="Abmelden">
+            <img src="{% static 'Logout.png' %}" alt="Logout Icon" class="logout-icon">
+        </a>
+    </div>
+</header>
+<main>
+    <div class="zimmer-grid">
+        {% for raum in raumdaten %}
+            <button class="zimmer">
+                <div class="zimmer-name">{{ raum.Raumnummer }}</div>
+                <div class="temperatur">{{ raum.Temperatur }}°C</div>
+                <div class="temperatur">{{ raum.Luftfeuchtigkeit }}%</div>
+            </button>
+        {% endfor %}
+    </div>
+</main>
+
+<footer>
+    <a href="{% url 'Kontakt' %}">Impressum</a>
+</footer>
+
+</body>
+</html>

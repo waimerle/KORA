@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldung KORA</title>
+    <link rel="icon" href={% static 'KORA.png' %} type="image/png">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .form-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        input[type="password"] {
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            background-color: white;
+            color: #333;
+            width: 250px;
+        }
+        input[type="password"]:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+        .container {
+            flex: 1;
+            margin: 30px auto;
+            text-align: center;
+        }
+        .submit-button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            height: 46px;
+        }
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+        .logo-unterseite {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Willkommen bei KARO!</h1>
+</header>
+
+<main class="container">
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="code">Code ihrer Stadtverwaltung eingeben:</label><br><br>
+        <div class="form-group">
+            <input type="password" id="code" name="code" required>
+            <button type="submit" class="submit-button">Anmelden</button>
+        </div>
+        {% if fehler %}
+            <p style="color:red;">{{ fehler }}</p>
+        {% endif %}
+	<p>Sie haben noch kein Konto? Registrieren Sie sich <a href="{% url 'Kontoerstellung' %}">hier</a>.</p>
+        
+    </form>
+</main>
+
+<!-- Logo ganz unten -->
+<img src="test.jpeg" alt="Logo" class="logo-unterseite">
+
+</body>
+</html>
