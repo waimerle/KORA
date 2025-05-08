@@ -1,1 +1,3 @@
 https://pypi.org/project/mfrc522-python/#files
+
+pip install mfrc522-python
