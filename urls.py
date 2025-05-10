@@ -10,5 +10,7 @@ urlpatterns = [
     path("Adminverwaltung.html", app_views.adminView, name= 'Adminverwaltung'),
     path("Personalverwaltung.html", app_views.persoanlView, name= 'Personalverwaltung'),
     path("Kontakt.html", app_views.kontaktView, name='Kontakt'),
-    path("abmelden", app_views.Abmeldung, name='abmelden'),    
+    path("abmelden", app_views.Abmeldung, name='abmelden'),
+    path("rfid-empfang/", app_views.rfid_empfang, name="rfid_empfang"),
+    
 ]
