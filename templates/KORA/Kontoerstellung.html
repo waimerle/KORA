@@ -1,94 +1,181 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrierung KORA</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href={% static 'KORA.png' %} type="image/png">
-
-</head>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrierung KORA</title>
+  <link rel="icon" href="{% static 'KORA.png' %}" type="image/png">
+  <style>
     body {
-    font-family: Arial;
-    margin: 0;
-    padding: 0;
-}
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-.container {
-    width: 100%;
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-}
+    header {
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-h2 {
-    text-align: center;
-    color: #333;
-}
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      flex-grow: 1;
+      text-align: center;
+    }
 
-form {
-    display: flex;
-    flex-direction: column;
-}
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    header img {
+      height: 40px;
+      cursor: pointer;
+    }
 
 
-label {
-    font-weight: bold;
-}
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
 
+    h2 {
+      text-align: center;
+      color: #007BFF;
+      margin-bottom: 30px;
+    }
 
-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
+    .container {
+      flex: 1;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
 
-   /* Abstand zwischen den Eingabefeldern und anderen Elementen */
-div {
-        margin-bottom: 15px;  /* Hier wird der Abstand erhöht */
-}
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-}
+    label {
+      font-size: 18px;
+      margin-bottom: 8px;
+      text-align: left;
+      display: block;
+    }
 
-button:hover {
-    background-color: #0056b3;
-}
+    select,
+    input[type="email"] {
+      font-size: 16px;
+      padding: 12px;
+      border: 1px solid #007BFF;
+      border-radius: 5px;
+      background-color: white;
+      color: #333;
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-</style>
+    select:focus,
+    input[type="email"]:focus {
+      border-color: #0056b3;
+      outline: none;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      height: 46px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .message.error {
+      color: red;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    p {
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .logo-unterseite {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 20px;
+    }
+  </style>
+</head>
 <body>
-    <div class="container">
-        <h2>Registrierung für Stadtverwaltung</h2>
 
-            <div>
+  <header>
+    <h1>Registrierung für KORA</h1>
+    <div class="header-right">
+      <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+  </div>
+
+  </header>
+
+  <div class="container">
     <form method="post">
-        {% csrf_token %}
-        <select name="stadtverwaltung" required>
-            <option value="" disabled selected>Bitte wählen Sie Ihre Stadtverwaltung</option>
-            {% for gemeinde in gemeinden %}
-                <option value="{{ gemeinde.name }}">{{ gemeinde.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="email" name="email" placeholder="E-Mail" required>
-        <button type="submit">Anmelden</button>
+      {% csrf_token %}
+      <select name="stadtverwaltung" required>
+        <option value="" disabled selected>Bitte wählen Sie Ihre Stadtverwaltung/Gemeinde</option>
+        {% for gemeinde in gemeinden %}
+          <option value="{{ gemeinde.name }}">{{ gemeinde.name }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="email" name="email" placeholder="E-Mail" required>
+
+      <button type="submit">Anmelden</button>
     </form>
-    {% if success %}
-        <p style="color: green;">Willkommensmail an {{ email }} wurde gesendet ✅</p>
-    {% endif %}
+
     {% if fehler %}
-        <p style="color: red;">{{ fehler }}</p>
+      <p class="message error">{{ fehler }}</p>
     {% endif %}
-	<p>Sind Sie bereits registriert, können Sie sich <a href="{% url 'Einwahl' %}">hier</a> anmelden.</p>
-            </div>
-    </div>
+
+    <p>Bereits registriert? <a href="{% url 'Einwahl' %}">Hier anmelden</a></p>
+  </div>
+
+  <!-- Logo ganz unten -->
+  <img src="{% static 'KORA.png' %}" alt="Logo" class="logo-unterseite">
+
 </body>
 </html>
