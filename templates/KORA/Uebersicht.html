@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="3">
     <title>Übersichtsseite</title>
-    <link rel="icon" href={% static 'KORA.png' %} type="image/png">
+    <link rel="icon" href="{% static 'KORA.png' %}" type="image/png" />
 
     <style>
         body {
@@ -65,10 +66,10 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
+            justify-content: flex-start;
         }
 
         .zimmer {
-            background-color: #007BFF;
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -76,14 +77,40 @@
             text-align: center;
             border: none;
             font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+        /* Zustand kommen - rot */
+        .kommen {
+            background-color: #d9534f;
+        }
+        .kommen:hover {
+            background-color: #b52b27;
+        }
+        /* Zustand gehen - blau */
+        .gehen {
+            background-color: #007BFF;
+        }
+        .gehen:hover {
+            background-color: #0056b3;
         }
 
-        .zimmer:hover {
-            background-color: #0056b3;
+        .zimmer-name {
+            font-size: 20px;
+            margin-bottom: 8px;
         }
 
         .temperatur {
             color: lightgray;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .zustand {
+            font-size: 16px;
+            margin-top: 8px;
+            font-weight: bold;
         }
 
         .back-button {
@@ -106,6 +133,9 @@
             color: white;
             padding: 15px;
             text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
 
         footer a {
@@ -117,6 +147,25 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        /* Responsive for mobile screens */
+        @media (max-width: 600px) {
+            .zimmer-grid {
+                gap: 12px;
+                justify-content: center;
+            }
+            .zimmer {
+                width: 45vw;
+                padding: 15px;
+                font-size: 14px;
+            }
+            .zimmer-name {
+                font-size: 18px;
+            }
+            .temperatur, .zustand {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -124,7 +173,7 @@
 <header>
     <div class="header-icons">
         <a href="{% url 'Info' %}">
-            <img src="{% static 'Info.png' %}" alt="Home_Icon" />
+            <img src="{% static 'Info.png' %}" alt="Home Icon" />
         </a>
     </div>
 
@@ -133,20 +182,26 @@
     <div class="header-right">
         <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
         <a href="{% url 'abmelden' %}" title="Abmelden">
-            <img src="{% static 'Logout.png' %}" alt="Logout Icon" class="logout-icon">
+            <img src="{% static 'Logout.png' %}" alt="Logout Icon" class="logout-icon" />
         </a>
     </div>
 </header>
+
 <main>
-    <div class="zimmer-grid">
-        {% for raum in raumdaten %}
-            <button class="zimmer">
-                <div class="zimmer-name">{{ raum.Raumnummer }}</div>
-                <div class="temperatur">{{ raum.Temperatur }}°C</div>
-                <div class="temperatur">{{ raum.Luftfeuchtigkeit }}%</div>
-            </button>
-        {% endfor %}
+{% for stockwerk, räume in stockwerke %}
+    <div class="stockwerk">
+        <h2>Stockwerk {{ stockwerk }}</h2>
+        <div class="zimmer-grid">
+            {% for raum in räume %}
+                <button class="zimmer {% if raum.Zustand == 'kommen' %}kommen{% elif raum.Zustand == 'gehen' %}gehen{% else %}gehen{% endif %}" aria-label="Raum {{ raum.Raumnummer }}">
+                    <div class="zimmer-name">{{ raum.Raumnummer }}</div>
+                    <div class="temperatur">Temperatur: {{ raum.Temperatur }}°C</div>
+                    <div class="temperatur">Luftfeuchtigkeit: {{ raum.Luftfeuchtigkeit }}%</div>
+                </button>
+            {% endfor %}
+        </div>
     </div>
+{% endfor %}
 </main>
 
 <footer>
