@@ -16,10 +16,30 @@
             flex-direction: column;
             min-height: 100vh;
         }
+
         header {
-            background-color: #007BFF;
-            color: white;
-            padding: 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header img {
+            height: 40px;
+            cursor: pointer;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            flex-grow: 1;
             text-align: center;
         }
         h1 {
@@ -77,7 +97,11 @@
 <body>
 
 <header>
-    <h1>Willkommen bei KARO!</h1>
+    <h1>Willkommen bei KORA!</h1>
+    <div class="header-right">
+        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+    </div>
+
 </header>
 
 <main class="container">
