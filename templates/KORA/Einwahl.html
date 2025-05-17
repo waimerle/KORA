@@ -2,126 +2,130 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anmeldung KORA</title>
-    <link rel="icon" href={% static 'KORA.png' %} type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anmeldung KORA</title>
+  <link rel="icon" href="{% static 'KORA.png' %}" type="image/png">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-        header {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      flex-grow: 1;
+      text-align: center;
+    }
 
-        header img {
-            height: 40px;
-            cursor: pointer;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-            flex-grow: 1;
-            text-align: center;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        label {
-            font-size: 18px;
-            margin-right: 10px;
-        }
-        .form-group {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        input[type="password"] {
-            font-size: 16px;
-            padding: 10px;
-            border: 1px solid #007BFF;
-            border-radius: 5px;
-            background-color: white;
-            color: #333;
-            width: 250px;
-        }
-        input[type="password"]:focus {
-            border-color: #0056b3;
-            outline: none;
-        }
-        .container {
-            flex: 1;
-            margin: 30px auto;
-            text-align: center;
-        }
-        .submit-button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            height: 46px;
-        }
-        .submit-button:hover {
-            background-color: #0056b3;
-        }
-        .logo-unterseite {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-    </style>
+    header img {
+      height: 40px;
+    }
+
+    .container {
+      flex: 1;
+      margin: 30px auto;
+      text-align: center;
+    }
+
+    label {
+      font-size: 18px;
+    }
+
+    .form-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    input[type="password"] {
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      width: 250px;
+    }
+
+    input[type="password"]:focus {
+      border-color: #0056b3;
+      outline: none;
+    }
+
+    .submit-button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .submit-button:hover {
+      background-color: #0056b3;
+    }
+
+    .logo-unterseite {
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    p {
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 
 <header>
-    <h1>Willkommen bei KORA!</h1>
-    <div class="header-right">
-        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
-    </div>
-
+  <h1>Willkommen bei KORA!</h1>
+  <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
 </header>
 
 <main class="container">
-    <form method="post" action="">
-        {% csrf_token %}
-        <label for="code">Code ihrer Stadtverwaltung eingeben:</label><br><br>
-        <div class="form-group">
-            <input type="password" id="code" name="code" required>
-            <button type="submit" class="submit-button">Anmelden</button>
-        </div>
-        {% if fehler %}
-            <p style="color:red;">{{ fehler }}</p>
-        {% endif %}
-	<p>Sie haben noch kein Konto? Registrieren Sie sich <a href="{% url 'Kontoerstellung' %}">hier</a>.</p>
-        
-    </form>
+  <form method="post">
+    {% csrf_token %}
+    <label for="code">Code Ihrer Stadtverwaltung eingeben:</label><br>
+    <div class="form-group">
+      <input type="password" id="code" name="code" required>
+      <button type="submit" class="submit-button">Anmelden</button>
+    </div>
+
+    {% if fehler %}
+      <p style="color: red;">{{ fehler }}</p>
+    {% endif %}
+
+    <p>Sie haben noch kein Konto? <a href="{% url 'Kontoerstellung' %}">Hier registrieren</a>.</p>
+  </form>
 </main>
 
-<!-- Logo ganz unten -->
-<img src="test.jpeg" alt="Logo" class="logo-unterseite">
+<img src="{% static 'KORA.png' %}" alt="Logo" class="logo-unterseite">
 
 </body>
 </html>
