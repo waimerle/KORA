@@ -12,5 +12,6 @@ urlpatterns = [
     path("Kontakt.html", app_views.kontaktView, name='Kontakt'),
     path("abmelden", app_views.Abmeldung, name='abmelden'),
     path("rfid-empfang/", app_views.rfid_empfang, name="rfid_empfang"),
+    path("Vorhersage.html/<str:rfid>/", app_views.vorhersage, name="Vorhersage"),
     
 ]
