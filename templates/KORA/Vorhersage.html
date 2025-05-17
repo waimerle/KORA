@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vorhersage Raumbelegung</title>
+  <link rel="icon" href="{% static 'KORA.png' %}" type="image/png" />
+
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+      color: #212529;
+    }
+header {
+            background-color: #007BFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left img,
+        .header-right img {
+            height: 40px;
+            cursor: pointer;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+    main {
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    form {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+    select {
+      padding: 8px 12px;
+      font-size: 16px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    select:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 5px rgba(0,123,255,.5);
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #dee2e6;
+      font-size: 16px;
+    }
+    th {
+      background-color: #007BFF;
+      color: white;
+      font-weight: 600;
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .back-button {
+      display: block;
+      width: max-content;
+      margin: 30px auto;
+      padding: 12px 25px;
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,123,255,0.3);
+      font-size: 16px;
+    }
+    .back-button:hover {
+      background-color: #0056b3;
+      box-shadow: 0 6px 10px rgba(0,86,179,0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      th, td {
+        font-size: 14px;
+        padding: 8px 6px;
+      }
+      .back-button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+      select {
+        font-size: 14px;
+        padding: 6px 10px;
+      }
+      label {
+        font-size: 14px;
+      }
+}
+
+        footer {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    
+  </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <a href="{% url 'Uebersicht' %}">
+            <img src="{% static 'Home.png' %}" alt="Home_Icon" />
+        </a>
+    </div>
+
+  <h1>Raumbelegung für Raum {{ raumnummer }}</h1>
+    <div class="header-right">
+        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+    </div>
+
+</header>
+
+<main>
+  <form method="get" action="">
+    <label for="tag">Wochentag auswählen:</label>
+    <select id="tag" name="tag" onchange="this.form.submit()">
+      {% for tag in tage %}
+      <option value="{{ tag }}" {% if tag == selected_day %}selected{% endif %}>{{ tag }}</option>
+      {% endfor %}
+    </select>
+    <noscript><input type="submit" value="Anzeigen"></noscript>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Uhrzeit</th>
+        {% for zeit in uhrzeiten %}
+          <th>{{ zeit }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Belegung</td>
+        {% for wert in belegung %}
+          <td>{{ wert }}</td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+
+</main>
+
+<footer>
+    <a href="{% url 'Kontakt' %}">Impressum</a>
+</footer>
+
+</body>
+</html>
