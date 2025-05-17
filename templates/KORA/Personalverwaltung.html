@@ -18,7 +18,7 @@
 
     header {
       background-color: #007bff;
-      color: #ffffff;
+      color: white;
       padding: 15px 20px;
       display: flex;
       align-items: center;
@@ -28,8 +28,8 @@
     header h1 {
       margin: 0;
       font-size: 24px;
-      flex-grow: 1;
       text-align: center;
+      flex-grow: 1;
     }
 
     .header-icons {
@@ -51,7 +51,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #ffffff;
+      background-color: white;
       border: 1px solid #dee2e6;
     }
 
@@ -64,7 +64,6 @@
     th {
       background-color: #007bff;
       color: white;
-      font-weight: normal;
     }
 
     input[type="text"] {
@@ -91,7 +90,7 @@
     }
 
     footer {
-      background-color: #007BFF;
+      background-color: #007bff;
       color: white;
       padding: 15px;
       text-align: center;
@@ -111,15 +110,14 @@
 <body>
 
 <header>
-  <div class="header-left">
-    <a href="{% url 'Adminverwaltung' %}">
-      <img src="{% static 'Home.png' %}" alt="Home_Icon" />
-    </a>
-  </div>
+  <a href="{% url 'Adminverwaltung' %}">
+    <img src="{% static 'Home.png' %}" alt="Home Icon">
+  </a>
 
   <h1>Personalverwaltung für {{ request.session.stadtverwaltung }}</h1>
+
   <div class="header-icons">
-    <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+    <img src="{% static 'KORA.png' %}" alt="KORA Logo">
     <a href="{% url 'abmelden' %}" title="Abmelden">
       <img src="{% static 'Logout.png' %}" alt="Logout Icon" style="height: 28px;">
     </a>
