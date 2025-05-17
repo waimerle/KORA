@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="3">
+    <meta http-equiv="refresh" content="1">
     <title>Übersichtsseite</title>
     <link rel="icon" href="{% static 'KORA.png' %}" type="image/png" />
 
@@ -193,11 +193,11 @@
         <h2>Stockwerk {{ stockwerk }}</h2>
         <div class="zimmer-grid">
             {% for raum in räume %}
-                <button class="zimmer {% if raum.Zustand == 'kommen' %}kommen{% elif raum.Zustand == 'gehen' %}gehen{% else %}gehen{% endif %}" aria-label="Raum {{ raum.Raumnummer }}">
+                <a href = "{% url 'Vorhersage' rfid=raum.RFIDID %}" class="zimmer {% if raum.Zustand == 'kommen' %}kommen{% elif raum.Zustand == 'gehen' %}gehen{% else %}gehen{% endif %}" aria-label="Raum {{ raum.Raumnummer }}">
                     <div class="zimmer-name">{{ raum.Raumnummer }}</div>
                     <div class="temperatur">Temperatur: {{ raum.Temperatur }}°C</div>
                     <div class="temperatur">Luftfeuchtigkeit: {{ raum.Luftfeuchtigkeit }}%</div>
-                </button>
+                </a>
             {% endfor %}
         </div>
     </div>
