@@ -114,6 +114,7 @@ def sendeMailMitCodes(request):
                 f"🔑 Einfaches Passwort: {einfaches_passwort}\n"
                 f"🔐 Admin-Passwort: {admin_passwort}\n\n"
                 f"Bitte bewahren Sie diese sicher auf.\n\n"
+                f"Bei Fragen zur Hardwareausstattung oder bei Erweiterungswünschen wenden Sie sich bitte direkt an das KORA-Team.\n\n"
                 f"Freundliche Grüße\n"
                 f"Ihr Projektteam KORA"
             )
@@ -490,5 +491,92 @@ def rfid_empfang(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-    
 
+
+def lade_raumdaten(pfad, stadtverwaltung):
+    raumdaten = {}
+    with open(pfad, newline='', encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for zeile in reader:
+            if zeile["Gemeindename"] == stadtverwaltung:
+            # Schlüssel: RFIDID, Wert: Raumnummer
+                raumdaten[zeile['RFIDID']] = zeile['Raumnummer']
+    return raumdaten   
+
+def vorhersage(request, rfid):
+    stadtverwaltung = request.session.get('stadtverwaltung')
+    if not stadtverwaltung:
+        return redirect("Einwahl")
+    rolle = request.session.get("rolle")
+    if rolle == "admin":
+        return redirect("Adminverwaltung")
+    
+    tag = request.GET.get('tag', 'Montag')
+
+    daten = lese_rfid_daten(rfidCSV)  # Pfad anpassen
+
+    if stadtverwaltung:
+        daten = [eintrag for eintrag in daten if eintrag['Gemeindename'] == stadtverwaltung]
+
+    belegung = berechne_belegung(rfid, tag, daten)
+    uhrzeiten = [f"{i+6}:00" for i in range(14)]
+    tage = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag']
+
+    raumdaten = lade_raumdaten(räumeCSV, stadtverwaltung)  # Pfad anpassen
+    raumnummer = raumdaten.get(str(rfid), f"Raum {rfid}")  # Fallback: RFId selbst
+
+    context = {
+        'rfid': rfid,
+        'raumnummer': raumnummer,
+        'selected_day': tag,
+        'belegung': belegung,
+        'uhrzeiten': uhrzeiten,
+        'tage': tage,
+    }
+
+    return render(request, 'KORA/Vorhersage.html', context)
+
+def lese_rfid_daten(pfad=rfidCSV):
+    daten = []
+    with open(pfad, newline='', encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for zeile in reader:
+            # Zeit in datetime-Objekt umwandeln
+            zeit = datetime.strptime(zeile['Zeit'], '%Y-%m-%d %H:%M:%S')
+            daten.append({
+                'Gemeindename': zeile['Gemeindename'],
+                'RFIDID': zeile['RFIDID'],
+                'Zustand': zeile['Zustand'],
+                'Zeit': zeit,
+                'ChipID': zeile['ChipID'],
+            })
+    return daten
+
+def berechne_belegung(rfid, tag, daten):
+    # tag z.B. "Montag", "Dienstag" ...
+    # Stunden von 6 bis 19 Uhr => 14 Werte
+
+    # Wochentag als Index (Montag=0)
+    wochentag_index = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'].index(tag)
+
+    belegung_stunden = [0]*14
+    stunden_counter = defaultdict(int)
+
+    # Filter nur Einträge mit dem gesuchten rfid und passendem Wochentag
+    for eintrag in daten:
+        if eintrag['RFIDID'] == rfid and eintrag['Zeit'].weekday() == wochentag_index:
+            stunde = eintrag['Zeit'].hour
+            if 6 <= stunde <= 19:
+                idx = stunde - 6
+                if eintrag['Zustand'] == 'kommen':
+                    stunden_counter[idx] += 1
+                elif eintrag['Zustand'] == 'gehen':
+                    stunden_counter[idx] -= 1
+
+    # kumulativ aufsummieren, um den aktuellen Belegungsstand pro Stunde zu bekommen
+    summe = 0
+    for i in range(14):
+        summe += stunden_counter[i]
+        belegung_stunden[i] = max(summe, 0)  # Nie negative Belegung
+
+    return belegung_stunden
