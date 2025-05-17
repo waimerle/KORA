@@ -2,210 +2,189 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="1">
-    <title>Übersichtsseite</title>
-    <link rel="icon" href="{% static 'KORA.png' %}" type="image/png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="1">
+  <title>Übersichtsseite</title>
+  <link rel="icon" href="{% static 'KORA.png' %}" type="image/png" />
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
-        header {
-            background-color: #007BFF;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-        }
-        header img {
-            height: 40px;
-            cursor: pointer;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-            flex-grow: 1;
-            text-align: center;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
 
-        .header-icons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
+    header {
+      background-color: #007BFF;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    header img {
+      height: 40px;
+      cursor: pointer;
+    }
 
-        .logout-icon {
-            height: 28px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      flex-grow: 1;
+      text-align: center;
+    }
 
-        .logout-icon:hover {
-            opacity: 0.7;
-        }
+    .header-icons,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-        main {
-            padding: 20px;
-        }
+    .logout-icon {
+      height: 28px;
+      transition: opacity 0.2s;
+    }
 
-        .stockwerk {
-            margin: 20px 0;
-        }
+    .logout-icon:hover {
+      opacity: 0.7;
+    }
 
-        .zimmer-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: flex-start;
-        }
+    main {
+      padding: 20px;
+    }
 
-        .zimmer {
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 150px;
-            text-align: center;
-            border: none;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: background-color 0.3s ease;
-            cursor: default;
-        }
-        /* Zustand kommen - rot */
-        .kommen {
-            background-color: #d9534f;
-        }
-        .kommen:hover {
-            background-color: #b52b27;
-        }
-        /* Zustand gehen - blau */
-        .gehen {
-            background-color: #007BFF;
-        }
-        .gehen:hover {
-            background-color: #0056b3;
-        }
+    .stockwerk {
+      margin: 20px 0;
+    }
 
-        .zimmer-name {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
+    .zimmer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
 
-        .temperatur {
-            color: lightgray;
-            font-size: 14px;
-            margin: 4px 0;
-        }
+    .zimmer {
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 150px;
+      text-align: center;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
 
-        .zustand {
-            font-size: 16px;
-            margin-top: 8px;
-            font-weight: bold;
-        }
+    .zimmer.kommen {
+      background-color: #d9534f;
+    }
 
-        .back-button {
-            display: block;
-            margin: 30px auto;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+    .zimmer.kommen:hover {
+      background-color: #b52b27;
+    }
 
-        .back-button:hover {
-            background-color: #0056b3;
-        }
+    .zimmer.gehen {
+      background-color: #007BFF;
+    }
 
-        footer {
-            background-color: #007BFF;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+    .zimmer.gehen:hover {
+      background-color: #0056b3;
+    }
 
-        footer a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
+    .zimmer-name {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
 
-        footer a:hover {
-            text-decoration: underline;
-        }
+    .temperatur {
+      font-size: 14px;
+      color: #f0f0f0;
+      margin: 4px 0;
+    }
 
-        /* Responsive for mobile screens */
-        @media (max-width: 600px) {
-            .zimmer-grid {
-                gap: 12px;
-                justify-content: center;
-            }
-            .zimmer {
-                width: 45vw;
-                padding: 15px;
-                font-size: 14px;
-            }
-            .zimmer-name {
-                font-size: 18px;
-            }
-            .temperatur, .zustand {
-                font-size: 12px;
-            }
-        }
-    </style>
+    footer {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .zimmer-grid {
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .zimmer {
+        width: 45vw;
+        padding: 15px;
+        font-size: 14px;
+      }
+
+      .zimmer-name {
+        font-size: 18px;
+      }
+
+      .temperatur {
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <header>
-    <div class="header-icons">
-        <a href="{% url 'Info' %}">
-            <img src="{% static 'Info.png' %}" alt="Home Icon" />
-        </a>
-    </div>
+  <div class="header-icons">
+    <a href="{% url 'Info' %}">
+      <img src="{% static 'Info.png' %}" alt="Info Icon" />
+    </a>
+  </div>
 
-    <h1>Zimmerverwaltung für {{ request.session.stadtverwaltung }}</h1>
+  <h1>Zimmerverwaltung für {{ request.session.stadtverwaltung }}</h1>
 
-    <div class="header-right">
-        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
-        <a href="{% url 'abmelden' %}" title="Abmelden">
-            <img src="{% static 'Logout.png' %}" alt="Logout Icon" class="logout-icon" />
-        </a>
-    </div>
+  <div class="header-right">
+    <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+    <a href="{% url 'abmelden' %}" title="Abmelden">
+      <img src="{% static 'Logout.png' %}" alt="Logout Icon" class="logout-icon" />
+    </a>
+  </div>
 </header>
 
 <main>
-{% for stockwerk, räume in stockwerke %}
+  {% for stockwerk, räume in stockwerke %}
     <div class="stockwerk">
-        <h2>Stockwerk {{ stockwerk }}</h2>
-        <div class="zimmer-grid">
-            {% for raum in räume %}
-                <a href = "{% url 'Vorhersage' rfid=raum.RFIDID %}" class="zimmer {% if raum.Zustand == 'kommen' %}kommen{% elif raum.Zustand == 'gehen' %}gehen{% else %}gehen{% endif %}" aria-label="Raum {{ raum.Raumnummer }}">
-                    <div class="zimmer-name">{{ raum.Raumnummer }}</div>
-                    <div class="temperatur">Temperatur: {{ raum.Temperatur }}°C</div>
-                    <div class="temperatur">Luftfeuchtigkeit: {{ raum.Luftfeuchtigkeit }}%</div>
-                </a>
-            {% endfor %}
-        </div>
+      <h2>Stockwerk {{ stockwerk }}</h2>
+      <div class="zimmer-grid">
+        {% for raum in räume %}
+          <a href="{% url 'Vorhersage' rfid=raum.RFIDID %}" class="zimmer {% if raum.Zustand == 'kommen' %}kommen{% else %}gehen{% endif %}" aria-label="Raum {{ raum.Raumnummer }}">
+            <div class="zimmer-name">{{ raum.Raumnummer }}</div>
+            <div class="temperatur">Temperatur: {{ raum.Temperatur }}°C</div>
+            <div class="temperatur">Luftfeuchtigkeit: {{ raum.Luftfeuchtigkeit }}%</div>
+          </a>
+        {% endfor %}
+      </div>
     </div>
-{% endfor %}
+  {% endfor %}
 </main>
 
 <footer>
-    <a href="{% url 'Kontakt' %}">Impressum</a>
+  <a href="{% url 'Kontakt' %}">Impressum</a>
 </footer>
 
 </body>
