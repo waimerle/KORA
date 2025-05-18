@@ -4,6 +4,11 @@ import RPi.GPIO as GPIO
 import time
 import datetime
 
+LED_PIN = 20
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+
 reader = MFRC522(bus=0, device=1, spd=50000, pin_mode=10, pin_rst=22)
 url = "http://[2001:7c0:2320:2:f816:3eff:fec1:da44]:8000/rfid-empfang/"
 
@@ -48,7 +53,11 @@ try:
                     status_text = "gehen"   # Gerade Anzahl: gehen
                 
                 send_rfid_data(gemeinde, rfid_id, uid, zeit, status_text)
+                GPIO.output(LED_PIN, GPIO.HIGH)
                 time.sleep(3)
+                GPIO.output(LED_PIN, GPIO.LOW)
+                time.sleep(10)
+
 
 except KeyboardInterrupt:
     print("Beendet durch Benutzer.")
