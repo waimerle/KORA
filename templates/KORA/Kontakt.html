@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Impressum</title>
+  <meta http-equiv="refresh" content="3">
+  <title>Info</title>
   <link rel="icon" href="{% static 'KORA.png' %}" type="image/png">
 
   <style>
@@ -12,15 +13,21 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-     }
+      background-color: #f4f4f4;
+    }
 
     header {
-      background-color: #007bff;
-      color: #ffffff;
-      padding: 15px 20px;
+      background-color: #007BFF;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 10px 20px;
+    }
+
+    header img {
+      height: 40px;
+      cursor: pointer;
     }
 
     header h1 {
@@ -30,103 +37,131 @@
       text-align: center;
     }
 
-    .header-icons {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    header img {
-      height: 40px;
-      cursor: pointer;
-    }
-
     main {
       padding: 20px;
     }
 
-    h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
     }
 
-   
-    .back-button {
-      margin-top: 30px;
-      display: inline-block;
+    table, th, td {
+      border: 1px solid #007BFF;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
       background-color: #007BFF;
       color: white;
+    }
+
+    .back-button {
+      display: block;
+      margin: 30px auto;
       padding: 10px 20px;
-      text-decoration: none;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
       font-size: 16px;
-      border-radius: 4px;
+      cursor: pointer;
     }
 
     .back-button:hover {
-      background-color: blue;
+      background-color: #0056b3;
+    }
+
+    footer {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      td {
+        padding: 8px;
+        border: none;
+        border-bottom: 1px solid #ccc;
+      }
+
+      tr {
+        margin-bottom: 10px;
+        border: 1px solid #007BFF;
+        border-radius: 5px;
+        background-color: white;
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
 
 <header>
-    <div class="header-icons">
-        {% if request.session.rolle == 'admin' %}
-            <a href="{% url 'Adminverwaltung' %}">
-                <img src="{% static 'Home.png' %}" alt="Home_Icon_Admin" />
-            </a>
-        {% elif request.session.rolle == 'benutzer' %}
-            <a href="{% url 'Uebersicht' %}">
-                <img src="{% static 'Home.png' %}" alt="Home_Icon_Benutzer" />
-            </a>
-        {% endif %}
-    </div>
-
-    <h1>Impressum</h1>
-
-    <div class="header-right">
-        <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
-    </div>
-</header>
-
-
-<main>
-  <div>
-    <h2>Angaben gemäß § 5 TMG</h2>
-    <p>
-      Sophie Schumann & Leonie Waimer<br>
-      Reuteallee 36<br>
-      71634 Ludwigsburg <br>
-      Deutschland
-    </p>
-
-    <h2>Vertreten durch</h2>
-    <p>
-      Sophie Schumann <br>
-      Leonie Waimer <br>
-    </p>
-
-    <h2>Kontakt</h2>
-    <p>
-      E-Mail: buchung.kora@gmail.com
-    </p>
-
-    <h2>Haftungsausschluss</h2>
-    <p>
-      Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Dennoch wird keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernommen. Eine Haftung für Schäden, die durch die Nutzung der auf dieser Website bereitgestellten Informationen entstehen, wird ausgeschlossen.
-    </p>
-    <h2>Haftung für Links</h2>
-    <p>
-      Unsere Website enthält Links zu externen Websites. Auf den Inhalt dieser Websites haben wir keinen Einfluss. Deshalb können wir keine Gewähr für diese Inhalte übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
-    </p>
-
-    <h2>Datenschutz</h2>
-    <p>
-      Ihre personenbezogenen Daten werden auf dieser Website nur in dem Umfang verarbeitet, wie es zur Nutzung unserer Dienste erforderlich ist. Weitere Informationen zum Datenschutz finden Sie in unserer Datenschutzrichtlinie.
-    </p>
+  <div class="header-left">
+    <a href="{% url 'Uebersicht' %}">
+      <img src="{% static 'Home.png' %}" alt="Zur Übersicht" />
+    </a>
   </div>
 
+  <h1>Zimmerbelegung für {{ request.session.stadtverwaltung }}</h1>
+
+  <div class="header-right">
+    <img src="{% static 'KORA.png' %}" alt="KORA Logo" />
+  </div>
+</header>
+
+<main>
+  <table>
+    <thead>
+      <tr>
+        <th>Zimmer</th>
+        <th>Temperatur</th>
+        <th>Luftfeuchtigkeit</th>
+        <th>Mitarbeiter</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for raum in raumdaten %}
+      <tr>
+        <td>{{ raum.Raumnummer }}</td>
+        <td>{{ raum.Temperatur }} °C</td>
+        <td>{{ raum.Luftfeuchtigkeit }} %</td>
+        <td>{% if raum.Mitarbeitername %}{{ raum.Mitarbeitername }}{% else %}Frei{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </main>
+
+<footer>
+  <a href="{% url 'Kontakt' %}">Impressum</a>
+</footer>
 
 </body>
 </html>
