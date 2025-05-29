@@ -148,7 +148,7 @@ def codeÜberprüfungAnmeldung(request):
                         elif eingegebenerCode == adminPasswort:
                             request.session["stadtverwaltung"] = stadtverwaltung
                             request.session["rolle"] = "admin"
-                            return redirect("Adminverwaltung")                                    
+                            return redirect("Raumverwaltung")                                    
             fehlermeldung = "Ungültiger Code. Bitte versuchen Sie es erneut."
 
     return render(request, "KORA/Einwahl.html", {
@@ -162,7 +162,7 @@ def übersichtRäume(request):
         return redirect("Einwahl")
     rolle = request.session['rolle']
     if rolle == "admin":
-        return redirect("Adminverwaltung")
+        return redirect("Raumverwaltung")
     
     raumdaten = []
     with open(räumeCSV, mode='r', encoding="utf-8-sig") as file:
@@ -236,38 +236,35 @@ def übersichtRäume(request):
 def infoRaumbelegung(request):
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
-        return redirect("Einwahl")
+        return redirect("Einwahl.html")
     rolle = request.session.get("rolle")
     if rolle == "admin":
-        return redirect("Adminverwaltung")
+        return redirect("Raumverwaltung.html")
 
     raumdaten = []
     with open(räumeCSV, mode='r', encoding="utf-8-sig") as file:
         reader = csv.DictReader(file, delimiter=',')
-        for zeile in reader:
-            if "Gemeindename" in zeile and zeile["Gemeindename"].strip() == stadtverwaltung.strip():
+        for row in reader:
+            if "Gemeindename" in row and row["Gemeindename"].strip() == stadtverwaltung.strip():
                 raumdaten.append({
-                    'Gemeindename': zeile["Gemeindename"],
-                    'Raumnummer': zeile["Raumnummer"],
-                    'Stockwerk': zeile["Stockwerk"],
-                    'SensorID': zeile["SensorID"],
-                    'RFIDID': zeile["RFIDID"],
+                    'Gemeindename': row["Gemeindename"],
+                    'Raumnummer': row["Raumnummer"],
+                    'Stockwerk': row["Stockwerk"],
+                    'SensorID': row["SensorID"],
+                    'RFIDID': row["RFIDID"],
                     'Zustand': 'frei',
                 })
 
+    # RFID-Daten mit Zeitstempel prüfen, um letzten Zustand zu erkennen
     rfidDaten = {}
     with open(rfidCSV, mode='r', encoding="utf-8-sig") as file:
         reader = csv.DictReader(file, delimiter=',')
         for row in reader:
-            if zeile.get("Gemeindename", "").strip() == stadtverwaltung.strip():
-                rfidID = zeile['RFIDID']
-                zeitAlsString = zeile['Zeit']
-                zustand = zeile['Zustand']
-                chipID = zeile['ChipID']
-                try:
-                    zeit = datetime.strptime(zeitAlsString, "%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    zeit = datetime.min
+            if row.get("Gemeindename", "").strip() == stadtverwaltung.strip():
+                rfidID = row['RFIDID']
+                zeit = row['Zeit']
+                zustand = row['Zustand']
+                chipID = row['ChipID']
 
                 if rfidID not in rfidDaten or rfidDaten[rfidID]['Zeit'] < zeit:
                     rfidDaten[rfidID] = {
@@ -276,6 +273,7 @@ def infoRaumbelegung(request):
                         'Zeit': zeit
                     }
 
+    # Zustand und ChipID zuweisen
     for raum in raumdaten:
         rfidID = raum['RFIDID']
         if rfidID in rfidDaten:
@@ -286,18 +284,19 @@ def infoRaumbelegung(request):
             if zustand == "kommen":
                 raum['Zustand'] = "belegt"
                 raum['ChipID'] = chipID
-            else:
+            else:  # gehen oder leer
                 raum['Zustand'] = "frei"
                 raum['ChipID'] = None
 
+    # Temperatur- und Luftfeuchtigkeitsdaten ergänzen
     sensorDaten = {}
     with open(temperaturCSV, mode='r', encoding="utf-8-sig") as file:
         reader = csv.DictReader(file, delimiter=',')
-        for zeile in reader:
-            if zeile.get("Gemeindename", "").strip() == stadtverwaltung.strip():
-                sensorDaten[zeile['SensorID']] = {
-                    'Temperatur': zeile['Temperatur'],
-                    'Luftfeuchtigkeit': zeile['Luftfeuchtigkeit'],
+        for row in reader:
+            if row.get("Gemeindename", "").strip() == stadtverwaltung.strip():
+                sensorDaten[row['SensorID']] = {
+                    'Temperatur': row['Temperatur'],
+                    'Luftfeuchtigkeit': row['Luftfeuchtigkeit'],
                 }
 
     for raum in raumdaten:
@@ -306,13 +305,14 @@ def infoRaumbelegung(request):
             raum['Temperatur'] = sensorDaten[sensorID]['Temperatur']
             raum['Luftfeuchtigkeit'] = sensorDaten[sensorID]['Luftfeuchtigkeit']
 
+    # Mitarbeiterdaten verknüpfen
     chipDaten = {}
     with open(mitarbeiterChipCSV, mode='r', encoding="utf-8-sig") as file:
         reader = csv.DictReader(file, delimiter=',')
-        for zeile in reader:
-            if zeile.get("Gemeindename", "").strip() == stadtverwaltung.strip():
-                chipDaten[zeile['ChipID']] = {
-                    'Mitarbeitername': zeile['Mitarbeitername'],
+        for row in reader:
+            if row.get("Gemeindename", "").strip() == stadtverwaltung.strip():
+                chipDaten[row['ChipID']] = {
+                    'Mitarbeitername': row['Mitarbeitername'],
                 }
 
     for raum in raumdaten:
@@ -322,20 +322,102 @@ def infoRaumbelegung(request):
         else:
             raum['Mitarbeitername'] = None
 
-    return render(request, 'KORA/Info.html', {
-        'raumdaten': raumdaten
-        })
-
+    return render(request, 'KORA/Info.html', {'raumdaten': raumdaten})
 
 def raumVerwaltungAdmin(request):
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl")
+
     rolle = request.session.get("rolle")
     if rolle != "admin":
         return redirect("Uebersicht.html")
-    return render(request, 'KORA/Adminverwaltung.html')
 
+    if request.method == 'POST':
+        sensorid = request.POST.get('sensorid')
+        neuer_stockwerk = request.POST.get('stockwerk')
+        neue_raumnummer = request.POST.get('raumnummer')
+
+        neue_daten = []
+        with open(räumeCSV, newline='', encoding='utf-8-sig') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for zeile in reader:
+                if (zeile.get('Gemeindename', '').strip() == stadtverwaltung.strip() and
+                    zeile.get('SensorID') == sensorid):
+                    # Raum aktualisieren
+                    zeile['Stockwerk'] = neuer_stockwerk
+                    zeile['Raumnummer'] = neue_raumnummer
+                neue_daten.append(zeile)
+
+        # Prüfen, ob der SensorID-Eintrag überhaupt vorhanden war, sonst hinzufügen
+        if not any(d.get('SensorID') == sensorid and d.get('Gemeindename', '').strip() == stadtverwaltung.strip() for d in neue_daten):
+            neue_daten.append({
+                'Gemeindename': stadtverwaltung,
+                'Raumnummer': neue_raumnummer,
+                'Stockwerk': neuer_stockwerk,
+                'SensorID': sensorid,
+                'RFIDID': sensorid,  # Annahme: RFIDID = SensorID
+            })
+
+        with open(räumeCSV, 'w', newline='', encoding='utf-8-sig') as csvfile:
+            fieldnames = ['Gemeindename', 'Raumnummer', 'Stockwerk', 'SensorID', 'RFIDID']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(neue_daten)
+
+        return redirect('Raumverwaltung')
+
+    # --- GET-Request: Räume laden ---
+
+    # Hardware-Anzahl aus Gemeinden.csv lesen
+    hardware_verfuegbar = 0
+    with open(gemeindenCSV, newline='', encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for zeile in reader:
+            if zeile.get('Gemeindename', '').strip() == stadtverwaltung.strip():
+                try:
+                    hardware_verfuegbar = int(zeile.get('AnzahlHardware', 0))
+                except ValueError:
+                    hardware_verfuegbar = 0
+                break
+
+    # Räume aus CSV lesen und nach SensorID indizieren
+    raeume_dict = {}
+    with open(räumeCSV, newline='', encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for zeile in reader:
+            if zeile.get('Gemeindename', '').strip() == stadtverwaltung.strip():
+                raeume_dict[zeile['SensorID']] = zeile
+
+    # Liste mit allen Hardware IDs füllen, vorhandene Räume oder leere Einträge
+    raeume_liste = []
+    for i in range(1, hardware_verfuegbar + 1):
+        sensorid_str = str(i)
+        if sensorid_str in raeume_dict:
+            zeile = raeume_dict[sensorid_str]
+            raeume_liste.append({
+                'sensorid': zeile['SensorID'],
+                'gemeindename': zeile['Gemeindename'],
+                'raumnummer': zeile['Raumnummer'],
+                'stockwerk': zeile['Stockwerk'],
+                'rfidid': zeile['RFIDID'],
+            })
+        else:
+            raeume_liste.append({
+                'sensorid': sensorid_str,
+                'gemeindename': stadtverwaltung,
+                'raumnummer': '',
+                'stockwerk': '',
+                'rfidid': sensorid_str,
+            })
+
+    context = {
+        'raeume': raeume_liste,
+        'hardware_verfuegbar': hardware_verfuegbar,
+        'hardware_range': range(hardware_verfuegbar),
+    }
+
+    return render(request, 'KORA/Raumverwaltung.html', context)
 
 def persoanlVerwaltungAdmin(request):
     stadtverwaltung = request.session.get('stadtverwaltung')
@@ -406,41 +488,37 @@ def rfidDatenEmpfang(request):
 
     try:
         daten = json.loads(request.body)
-        erforderlicheFelder = {"gemeinde", "rfid_id", "eintraege"}
-        if not erforderlicheFelder.issubset(daten):
+
+        if "gemeinde" not in daten or "rfid_id" not in daten or "eintraege" not in daten:
             return JsonResponse({"error": "Fehlende Felder"}, status=400)
 
-        aktueller_status = {} 
+        aktueller_status = {}  # (gemeinde, rfid_id) -> chip_id oder None
 
         if os.path.exists(rfidCSV):
             with open(rfidCSV, mode='r', encoding='utf-8-sig') as file:
                 reader = csv.DictReader(file)
-                for zeile in reader:
-                    key = (zeile["Gemeindename"], zeile["RFIDID"])
-                    if zeile["Zustand"] == "kommen":
-                        aktueller_status[key] = zeile["ChipID"]
-                    elif zeile["Zustand"] == "gehen":
-                        if key in aktueller_status and aktueller_status[key] == zeile["ChipID"]:
+                for row in reader:
+                    key = (row["Gemeindename"], row["RFIDID"])
+                    if row["Zustand"] == "kommen":
+                        aktueller_status[key] = row["ChipID"]
+                    elif row["Zustand"] == "gehen":
+                        if key in aktueller_status and aktueller_status[key] == row["ChipID"]:
                             aktueller_status[key] = None
 
-        with open(rfidCSV, "a+", newline="", encoding="utf-8-sig") as f:
-            f.seek(0)
-            inhalt = f.read(1)
-            fieldnames=["Gemeindename", "RFIDID", "Zustand", "Zeit", "ChipID"]
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+        with open(rfidCSV, "a", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["Gemeindename", "RFIDID", "Zustand", "Zeit", "ChipID"])
 
-            if not inhalt:
+            if os.stat(rfidCSV).st_size == 0:
                 writer.writeheader()
 
-            gemeinde = daten["gemeinde"]
-            rfid_id = str(daten["rfid_id"])
-
-            for eintrag in daten["eintraege"]:              
+            for eintrag in daten["eintraege"]:
+                gemeinde = daten["gemeinde"]
+                rfid_id = str(daten["rfid_id"])
                 chip_id = eintrag["rfid"]
                 zeit = eintrag["zeit"]
-                zustand = eintrag.get("status", "kommen")
-                
+                zustand = eintrag.get("status", "kommen")  # Status vom Pi übernehmen
                 key = (gemeinde, rfid_id)
+
                 aktuell_drin = aktueller_status.get(key)
 
                 if zustand == "kommen":
@@ -468,7 +546,6 @@ def rfidDatenEmpfang(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-
 def lade_raumdaten(pfad, stadtverwaltung):
     raumdaten = {}
     with open(pfad, newline='', encoding='utf-8-sig') as csvfile:
@@ -485,7 +562,7 @@ def vorhersage(request, rfid):
         return redirect("Einwahl")
     rolle = request.session.get("rolle")
     if rolle == "admin":
-        return redirect("Adminverwaltung")
+        return redirect("Raumverwaltung")
     
     tag = request.GET.get('tag', 'Montag')
 
@@ -567,3 +644,48 @@ def berechne_belegung(rfid, tag, daten):
         belegung_stunden[stunde] = max(summe, 0)
 
     return belegung_stunden
+
+@csrf_exempt
+def dhtDatenEmpfang(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Nur POST erlaubt"}, status=405)
+
+    try:
+        daten = json.loads(request.body)
+
+        # if not all(k in daten for k in ("sensor_id", "temperature", "humidity", "gemeindename")):
+        #     return JsonResponse({"error": "Fehlende Felder"}, status=400)
+
+        eintrag_aktualisiert = False
+        neue_zeilen = []
+
+        fieldnames = ["Gemeindename", "SensorID", "Temperatur", "Luftfeuchtigkeit"]
+
+        if os.path.exists(temperaturCSV):
+            with open(temperaturCSV, "r", newline="", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row["SensorID"] == str(daten["sensor_id"]) and row["Gemeindename"] == daten["gemeindename"]:
+                        row["Temperatur"] = daten["temperature"]
+                        row["Luftfeuchtigkeit"] = daten["humidity"]
+                        eintrag_aktualisiert = True
+                    neue_zeilen.append(row)
+
+        if not eintrag_aktualisiert:
+            neue_zeilen.append({
+                "Gemeindename": daten["gemeindename"],
+                "SensorID": str(daten["sensor_id"]),
+                "Temperatur": daten["temperature"],
+                "Luftfeuchtigkeit": daten["humidity"]
+            })
+
+        with open(temperaturCSV, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(neue_zeilen)
+
+        return JsonResponse({"status": "Daten aktualisiert" if eintrag_aktualisiert else "Daten hinzugefügt"})
+
+    except Exception as e:
+        print(traceback.format_exc())
+        return JsonResponse({"error": str(e)}, status=500)
