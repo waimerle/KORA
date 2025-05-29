@@ -1,6 +1,7 @@
 @reboot /usr/bin/python3 /home/Leonie/RFIDclean.py
 @reboot /home/Leonie/env/bin/python /home/Leonie/RFID7anServer.py >> /home/Leonie/RFID7.log 2>&1
 @reboot /home/Leonie/env/bin/python /home/Leonie/RFID8anServer.py >> /home/Leonie/RFID8.log 2>&1
+@reboot /home/Leonie/env/bin/python /home/Leonie/dhtWerteanServer.py >> /home/Leonie/dht.log 2>&1
 
 
 # Edit this file to introduce tasks to be run by cron.
