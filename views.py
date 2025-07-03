@@ -332,7 +332,8 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
     rolle = request.session.get("rolle")
     if rolle != "admin":
         return redirect("Uebersicht.html")
-
+        
+# Wenn Formualar abgesendet werden die Daten ausgelesen 
     if request.method == 'POST':
         sensorid = request.POST.get('sensorid')
         neuer_stockwerk = request.POST.get('stockwerk')
@@ -349,7 +350,8 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
                     zeile['Raumnummer'] = neue_raumnummer
                 neue_daten.append(zeile)
 
-        # Prüfen, ob der SensorID-Eintrag überhaupt vorhanden war, sonst hinzufügen
+        # Prüfen, ob der SensorID-Eintrag überhaupt vorhanden war, sonst wird neuer hinzufügen
+        # any gibt TRUE zurück wenn eine Bedingung erfüllt ist 
         if not any(d.get('SensorID') == sensorid and d.get('Gemeindename', '').strip() == stadtverwaltung.strip() for d in neue_daten):
             neue_daten.append({
                 'Gemeindename': stadtverwaltung,
@@ -359,6 +361,7 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
                 'RFIDID': sensorid,  # Annahme: RFIDID = SensorID
             })
 
+        # Neue Raumdaten in CSV speichern 
         with open(räumeCSV, 'w', newline='', encoding='utf-8-sig') as csvfile:
             fieldnames = ['Gemeindename', 'Raumnummer', 'Stockwerk', 'SensorID', 'RFIDID']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -369,7 +372,7 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
 
     # --- GET-Request: Räume laden ---
 
-    # Hardware-Anzahl aus Gemeinden.csv lesen
+    # Hardware-Anzahl aus Gemeinden.csv lesen falls fehhler wird auf null gesetzt 
     hardware_verfuegbar = 0
     with open(gemeindenCSV, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -393,6 +396,7 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
     raeume_liste = []
     for i in range(1, hardware_verfuegbar + 1):
         sensorid_str = str(i)
+        # wenn raum schon exisitiert hol alle daten zu diesem Sensor 
         if sensorid_str in raeume_dict:
             zeile = raeume_dict[sensorid_str]
             raeume_liste.append({
@@ -402,6 +406,7 @@ def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
                 'stockwerk': zeile['Stockwerk'],
                 'rfidid': zeile['RFIDID'],
             })
+        #wenn Raum noch nicht existiert dann füge leeren Raum hinzu 
         else:
             raeume_liste.append({
                 'sensorid': sensorid_str,
