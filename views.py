@@ -647,19 +647,21 @@ def berechne_belegung(rfid, tag, daten): #Zählt jede Stunde (6-20), wie viele P
 
 @csrf_exempt
 def dhtDatenEmpfang(request): #Sensordaten vom Pi --> Temperatur.csv
+    
     if request.method != "POST":
         return JsonResponse({"error": "Nur POST erlaubt"}, status=405)
-
+# geschickte Daten als json auslesen 
     try:
         daten = json.loads(request.body)
 
         
-
+# wir merken uns, ob später ein Eintrag aktualisiert wurde 
         eintrag_aktualisiert = False
         neue_zeilen = []
-
+# Spaltenüberschrift der CSV-Datei
         fieldnames = ["Gemeindename", "SensorID", "Temperatur", "Luftfeuchtigkeit"]
-
+        
+# geht jede Zeile durch, wenn Zeile denselben Sensor und Ort hat wie vom PI wird der Wert aktualisiert 
         if os.path.exists(temperaturCSV):
             with open(temperaturCSV, "r", newline="", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
@@ -669,7 +671,8 @@ def dhtDatenEmpfang(request): #Sensordaten vom Pi --> Temperatur.csv
                         row["Luftfeuchtigkeit"] = daten["humidity"]
                         eintrag_aktualisiert = True
                     neue_zeilen.append(row)
-
+                    
+# falls kein Eintrag vorhanden wird neuer hinzugefügt 
         if not eintrag_aktualisiert:
             neue_zeilen.append({
                 "Gemeindename": daten["gemeindename"],
@@ -678,6 +681,7 @@ def dhtDatenEmpfang(request): #Sensordaten vom Pi --> Temperatur.csv
                 "Luftfeuchtigkeit": daten["humidity"]
             })
 
+# neue CSV Datei wird geschrieben 
         with open(temperaturCSV, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
