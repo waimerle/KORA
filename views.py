@@ -19,21 +19,21 @@ rfidCSV = '/var/www/django-projekt/KORA/RFID.csv'
 temperaturCSV = '/var/www/django-projekt/KORA/Temperatur.csv'
 
 
-def einfachesPasswortErstellen(vergebenePasswörter, länge=6):
+def einfachesPasswortErstellen(vergebenePasswörter, länge=6): #generiert Passwort aus Ziffern mit 6 Stellen
     while True:
         passwort = ''.join(random.choices('0123456789', k=länge))
         if passwort not in vergebenePasswörter:
             return passwort
 
 
-def adminPasswortErstellen(vergebenePasswörter, länge=10):
+def adminPasswortErstellen(vergebenePasswörter, länge=10): #generiert Passwort aus Ziffern mit 10 Stellen
     while True:
         passwort = ''.join(random.choices('0123456789', k=länge))
         if passwort not in vergebenePasswörter:
             return passwort
 
 
-def gemeindenLaden():
+def gemeindenLaden(): #liest Gemeinden.csv ein und extrahiert Namen und Typen der Gemeinden
     gemeinden = []
     if os.path.isfile(gemeindenCSV):
         with open(gemeindenCSV, mode="r", encoding="utf-8-sig") as datei:
@@ -45,7 +45,7 @@ def gemeindenLaden():
     return gemeinden
 
 
-def sendeMailMitCodes(request):
+def sendeMailMitCodes(request): #Verarbeitung Anmeldeformular; Prüfung ob bereits registriert; E-Mail mit Zugangsdaten; Speichern der Daten in Code.csv
     erfolg = False 
     emailAdresse = None 
     stadtverwaltungName = None 
@@ -126,7 +126,7 @@ def sendeMailMitCodes(request):
     })
 
 
-def codeÜberprüfungAnmeldung(request):
+def codeÜberprüfungAnmeldung(request): #Login per Code --> Prüfung, ob Zugangscode korrekt ist 
     fehlermeldung = ""
 
     if request.method == "POST":
@@ -156,7 +156,7 @@ def codeÜberprüfungAnmeldung(request):
     })
 
 
-def übersichtRäume(request):
+def übersichtRäume(request): #zeigt Räume der Stadtverwaltung mit Raumdaten, Zustand und Sensorwerte; Gruppierung nach Stockwertke
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl")
@@ -233,7 +233,7 @@ def übersichtRäume(request):
     })
 
 
-def infoRaumbelegung(request):
+def infoRaumbelegung(request): #Infos zur Belegung; Raum- und Sensordatem; Verknü+pfung von Chip-ID mit Mitarbeitername
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl.html")
@@ -324,7 +324,7 @@ def infoRaumbelegung(request):
 
     return render(request, 'KORA/Info.html', {'raumdaten': raumdaten})
 
-def raumVerwaltungAdmin(request):
+def raumVerwaltungAdmin(request): #Raumdaten ändern oder neu anlegen
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl")
@@ -419,7 +419,7 @@ def raumVerwaltungAdmin(request):
 
     return render(request, 'KORA/Raumverwaltung.html', context)
 
-def persoanlVerwaltungAdmin(request):
+def persoanlVerwaltungAdmin(request): #Name der Mitarbeiter verknüpft mit Chip-ID
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl.html")
@@ -475,14 +475,14 @@ def impressum(request):
     return render(request, 'KORA/Kontakt.html')
 
 
-def abmeldung(request):
+def abmeldung(request): #löschen der Session
     request.session.flush()
 
     return redirect("Einwahl")
 
 
 @csrf_exempt
-def rfidDatenEmpfang(request):
+def rfidDatenEmpfang(request): #JSON-Daten mit RFID-Ereignisse annehmen --> RFID.csv 
     if request.method != "POST":
         return JsonResponse({"error": "Nur POST erlaubt"}, status=405)
 
@@ -546,7 +546,7 @@ def rfidDatenEmpfang(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-def lade_raumdaten(pfad, stadtverwaltung):
+def lade_raumdaten(pfad, stadtverwaltung): #Hilfsfunktion --> holt Raumnummern der Stadtverwaltung aus CSV
     raumdaten = {}
     with open(pfad, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -556,7 +556,7 @@ def lade_raumdaten(pfad, stadtverwaltung):
     return raumdaten   
 
 
-def vorhersage(request, rfid):
+def vorhersage(request, rfid): #Wie viele Leute waren pro Stunde dort?
     stadtverwaltung = request.session.get('stadtverwaltung')
     if not stadtverwaltung:
         return redirect("Einwahl")
@@ -596,7 +596,7 @@ def vorhersage(request, rfid):
     return render(request, 'KORA/Vorhersage.html', context)
 
 
-def leseRfidDaten(pfad = rfidCSV):
+def leseRfidDaten(pfad = rfidCSV): #RFID.csv auslesen und Feld Zeit in echte Datumsobjekte konvertieren
     daten = []
     with open(pfad, newline='', encoding='utf-8-sig') as file:
         reader = csv.DictReader(file)
@@ -617,7 +617,7 @@ def leseRfidDaten(pfad = rfidCSV):
     return daten
 
 
-def berechne_belegung(rfid, tag, daten):
+def berechne_belegung(rfid, tag, daten): #Zählt jede Stunde (6-20), wie viele Personen im Raum sind. 
 
     wochentage = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag']
     try:
@@ -646,7 +646,7 @@ def berechne_belegung(rfid, tag, daten):
     return belegung_stunden
 
 @csrf_exempt
-def dhtDatenEmpfang(request):
+def dhtDatenEmpfang(request): #Sensordaten vom Pi --> Temperatur.csv
     if request.method != "POST":
         return JsonResponse({"error": "Nur POST erlaubt"}, status=405)
 
