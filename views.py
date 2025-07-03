@@ -222,10 +222,15 @@ def übersichtRäume(request): #zeigt Räume der Stadtverwaltung mit Raumdaten, 
             raum['Temperatur'] = sensorDaten[sensorID]['Temperatur']
             raum['Luftfeuchtigkeit'] = sensorDaten[sensorID]['Luftfeuchtigkeit']
 
+    # dictionary das automatisch für jeden Key eine leere liste anlegt 
     stockwerke_dict = defaultdict(list)
+    
     for raum in raumdaten:
         stockwerke_dict[raum['Stockwerk']].append(raum)
-
+        
+# items macht aus dem dict eine liste von tupeln
+#  "sorted(...key..)" sagt nach was sortiert werden soll 
+# lambda x: x[0] Nimmt zur Sortierung nur den Stockwerk-Namen (erstes Element) 
     sortierte_stockwerke = sorted(stockwerke_dict.items(), key=lambda x: x[0])
 
     return render(request, 'KORA/Uebersicht.html', {
