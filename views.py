@@ -653,8 +653,7 @@ def dhtDatenEmpfang(request): #Sensordaten vom Pi --> Temperatur.csv
     try:
         daten = json.loads(request.body)
 
-        # if not all(k in daten for k in ("sensor_id", "temperature", "humidity", "gemeindename")):
-        #     return JsonResponse({"error": "Fehlende Felder"}, status=400)
+        
 
         eintrag_aktualisiert = False
         neue_zeilen = []
